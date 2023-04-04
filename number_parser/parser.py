@@ -298,7 +298,7 @@ def parse_fraction(input_string, language=None):
     return None
 
 
-def parse(input_string, language=None):
+def parse(input_string, language=None, tag_ords=True):
     """
     Converts all the numbers in a sentence written in natural language to their numeric type while keeping
     the other words unchanged. Returns the transformed string.
@@ -315,9 +315,11 @@ def parse(input_string, language=None):
     tokens_taken = []
     pop_last_space = True
 
-    def _build_and_add_number(pop_last_space=False):
+    def _build_and_add_number(pop_last_space=False, is_ord=False):
         if tokens_taken:
             result = _build_number(tokens_taken, lang_data)
+            if is_ord and tag_ords:
+                result[0] += "_ord"
             tokens_taken.clear()
 
             for number in result:
@@ -347,7 +349,7 @@ def parse(input_string, language=None):
 
         if ordinal_number:
             tokens_taken.append(ordinal_number)
-            _build_and_add_number(pop_last_space=True)
+            _build_and_add_number(pop_last_space=True, is_ord=True)
         elif (
                 _is_cardinal_token(compare_token, lang_data)
                 or (_is_skip_token(compare_token, lang_data) and len(tokens_taken) != 0)
